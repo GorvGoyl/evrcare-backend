@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "dev-evrcare-backend"
+    "dev": "dev-evrcare-backend",
+    "stag": "stag-evrcare-backend",
+    "prod": "prod-evrcare-backend"
   }
 }
