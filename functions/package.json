@@ -1,6 +1,10 @@
 {
   "name": "functions",
   "scripts": {
+    "deploy:dev": "firebase deploy -P dev --only functions",
+    "deploy:stag": "firebase deploy -P stag --only functions",
+    "deploy:prod": "firebase deploy -P prod --only functions",
+    "//": "/internal commands/",
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
