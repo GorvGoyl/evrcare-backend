@@ -1,0 +1,42 @@
+{
+  "env": {
+    "commonjs": true,
+    "es2020": true,
+    "node": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "eslint-comments", "promise"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:promise/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "airbnb-typescript/base",
+    "plugin:eslint-comments/recommended",
+    "plugin:import/warnings",
+    "plugin:import/errors",
+    // always put prettier at last
+    "prettier",
+    "prettier/@typescript-eslint"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 11,
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "no-console": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "max-classes-per-file": "off",
+    // disable for functions only
+    "@typescript-eslint/no-use-before-define": [
+      "error",
+      { "functions": false, "classes": true }
+    ],
+    "@typescript-eslint/lines-between-class-members": "off"
+    // "indent": ["error", "tab"],
+    // "linebreak-style": ["error", "unix"],
+    // "quotes": ["error", "double"],
+    // "semi": ["error", "always"]
+  }
+}
