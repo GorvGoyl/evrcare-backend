@@ -9,7 +9,7 @@
     "//": "/internal commands/",
     "hotReload": "tsc --watch",
     "lint": "eslint ./src/** -c .eslintrc.json --ext .js,.ts",
-    "firebase:debug": "firebase emulators:start --only functions --inspect-functions",
+    "firebase:debug": "firebase emulators:start --only functions --inspect-functions=9230",
     "firebase:serve": "firebase emulators:start --only functions",
     "build": "tsc",
     "shell": "npm run build && firebase functions:shell",
