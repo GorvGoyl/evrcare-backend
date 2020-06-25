@@ -1,13 +1,17 @@
 {
   "name": "functions",
   "scripts": {
+    "serve": "$env:GOOGLE_APPLICATION_CREDENTIALS='dev-adminsdk.json'; npm run hotReload & npm run firebase:serve",
+    "serve:debug": "$env:GOOGLE_APPLICATION_CREDENTIALS='dev-adminsdk.json'; npm run hotReload & npm run firebase:debug",
     "deploy:dev": "firebase deploy -P dev --only functions",
     "deploy:stag": "firebase deploy -P stag --only functions",
     "deploy:prod": "firebase deploy -P prod --only functions",
     "//": "/internal commands/",
+    "hotReload": "tsc --watch",
     "lint": "eslint ./src/** -c .eslintrc.json --ext .js,.ts",
+    "firebase:debug": "firebase emulators:start --only functions --inspect-functions",
+    "firebase:serve": "firebase emulators:start --only functions",
     "build": "tsc",
-    "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
@@ -32,6 +36,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-promise": "^4.2.1",
     "firebase-functions-test": "^0.2.0",
+    "npm-run-all": "^4.1.5",
     "typescript": "^3.8.0"
   },
   "private": true

@@ -5,6 +5,7 @@
     "noUnusedLocals": true,
     "outDir": "lib",
     "sourceMap": true,
+    "resolveJsonModule": true,
     "strict": true,
     "target": "es2017",
     "noImplicitAny": true //disable use of 'any'

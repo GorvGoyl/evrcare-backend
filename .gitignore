@@ -67,8 +67,6 @@ node_modules/
 ## Compiled JavaScript files
 functions/**/*.js
 functions/**/*.js.map
-
+lib/**
 # Typescript v1 declaration files
-functions/typings/
-
-functions/node_modules/
+typings/
