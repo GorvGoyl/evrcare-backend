@@ -1,5 +1,12 @@
 import functions = require("firebase-functions");
 import admin = require("firebase-admin");
+import {
+  FormName,
+  InHomeBookingFormType,
+  BookingFormType,
+  BookingForm,
+  InHomeForm,
+} from "./types";
 // eslint-disable-next-line import/first
 // import * as serviceAccount from "../dev-adminsdk.json";
 // import sgMail = require("@sendgrid/mail");
@@ -20,23 +27,32 @@ const LOCATION = "asia-east2";
 
 export const bookService = functions
   .region(LOCATION)
-  .https.onCall(async (data, context) => {
+  .https.onCall(async (data: BookingForm, context) => {
     // validating a request
-    if (!data) {
+    if (!data || !data.formData) {
       throw new functions.https.HttpsError(
         "invalid-argument",
         "data doesnt exist"
       );
     }
     validateUser(context);
+    const uid = context.auth?.uid ?? "";
+    // const { formName } = data;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const bookingDetails = data.formData;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    bookingDetails.created = admin.firestore.FieldValue.serverTimestamp();
     return admin
       .firestore()
       .collection("orders")
-      .add(data)
+      .doc("users")
+      .collection(uid)
+      .doc()
+      .set(bookingDetails)
       .then(() => {
-        console.log("added a order successfully");
-        return { response: "yeah" };
+        console.log("added order successfully");
+        return { response: "ok" };
       })
       .catch((err) => {
         console.log(err);
@@ -48,18 +64,45 @@ export const bookService = functions
       });
   });
 
-export const helloWorld = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
-});
+export const getOrders = functions
+  .region(LOCATION)
+  .https.onCall(async (data, context) => {
+    // validating a request
+    if (data) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "no arguments expected"
+      );
+    }
 
-export const helloWorld2 = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
-});
+    validateUser(context);
+
+    return admin
+      .firestore()
+      .collection("orders")
+      .get()
+      .then((doc) => {
+        const snap: any = [];
+        doc.forEach((dx) => {
+          // snap.push({ id: dx.id, details: dx.data() });
+        });
+        console.log("delivered a snapshot");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        return { orders: snap };
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new functions.https.HttpsError(
+          "internal",
+          "some internal error try back later"
+        );
+      });
+  });
 
 // #region ## ----------------- utility methods ----------------- ##
 // validate a user if it authenticated && has evrcare email and it is verified
 function validateUser(context: functions.https.CallableContext): void {
-  if (!context.auth) {
+  if (!context.auth || !context.auth.uid) {
     throw new functions.https.HttpsError("unauthenticated", "no user found");
   }
 
@@ -69,21 +112,21 @@ function validateUser(context: functions.https.CallableContext): void {
     context.auth.token.email_verified
   );
 
-  if (!context.auth.token.email) {
-    throw new functions.https.HttpsError(
-      "failed-precondition",
-      "user has no email id please update your profile"
-    );
-  }
+  // if (!context.auth.token.email) {
+  //   throw new functions.https.HttpsError(
+  //     "failed-precondition",
+  //     "user has no email id please update your profile"
+  //   );
+  // }
 
   // if(!context.auth.token.email.match(/[a-z0-9._-]+@gmail+\.com/)){
   //     throw new functions.https.HttpsError("permission-denied","your are trying to access restriced resources!");
   // }
 
-  if (!context.auth.token.email_verified) {
-    throw new functions.https.HttpsError(
-      "permission-denied",
-      "email not verified"
-    );
-  }
+  // if (!context.auth.token.email_verified) {
+  //   throw new functions.https.HttpsError(
+  //     "permission-denied",
+  //     "email not verified"
+  //   );
+  // }
 }

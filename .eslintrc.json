@@ -33,7 +33,8 @@
       "error",
       { "functions": false, "classes": true }
     ],
-    "@typescript-eslint/lines-between-class-members": "off"
+    "@typescript-eslint/lines-between-class-members": "off",
+    "import/first": "off"
     // "indent": ["error", "tab"],
     // "linebreak-style": ["error", "unix"],
     // "quotes": ["error", "double"],

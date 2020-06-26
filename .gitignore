@@ -70,3 +70,5 @@ functions/**/*.js.map
 lib/**
 # Typescript v1 declaration files
 typings/
+lib/**/*.js
+lib/**/*.js.map

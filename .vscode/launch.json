@@ -10,7 +10,7 @@
       "name": "Attach",
       "port": 9230,
       "restart": true,
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": ["<node_internals>/**", "lib/**"]
     }
   ]
 }
