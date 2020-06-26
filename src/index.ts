@@ -1,33 +1,23 @@
-import functions = require("firebase-functions");
 import admin = require("firebase-admin");
-import {
-  FormName,
-  InHomeBookingFormType,
-  BookingFormType,
-  BookingForm,
-  InHomeForm,
-} from "./types";
-// eslint-disable-next-line import/first
+import functions = require("firebase-functions");
+import { BookingForm } from "./types";
 // import * as serviceAccount from "../dev-adminsdk.json";
-// import sgMail = require("@sendgrid/mail");
-// import util = require("util");
-// import axios from "axios";
 
 admin.initializeApp();
 // admin.initializeApp(functions.config().firebase);
-// admin.initializeApp({
-//   // below serviceAccount is only used for local serve and debug
-//   credential: admin.credential.cert(serviceAccount as any),
 
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount as any),
+//   databaseURL: "https://dev-evrcare-app.firebaseio.com",
 // });
 const LOCATION = "asia-east2";
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-
+// eslint-disable-next-line import/prefer-default-export
 export const bookService = functions
   .region(LOCATION)
   .https.onCall(async (data: BookingForm, context) => {
+    console.log("inside bookService function");
+
     // validating a request
     if (!data || !data.formData) {
       throw new functions.https.HttpsError(
@@ -36,97 +26,46 @@ export const bookService = functions
       );
     }
     validateUser(context);
-    const uid = context.auth?.uid ?? "";
+    const uid = context.auth?.uid as string;
     // const { formName } = data;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const bookingDetails = data.formData;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    bookingDetails.created = admin.firestore.FieldValue.serverTimestamp();
-    return admin
-      .firestore()
-      .collection("orders")
-      .doc("users")
-      .collection(uid)
-      .doc()
-      .set(bookingDetails)
-      .then(() => {
-        console.log("added order successfully");
-        return { response: "ok" };
-      })
-      .catch((err) => {
-        console.log(err);
+    console.log("bookingDetails set", bookingDetails);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    bookingDetails.created = admin.firestore.Timestamp.now();
 
-        throw new functions.https.HttpsError(
-          "internal",
-          "some internal error try back later"
-        );
-      });
-  });
+    const db = admin.firestore();
 
-export const getOrders = functions
-  .region(LOCATION)
-  .https.onCall(async (data, context) => {
-    // validating a request
-    if (data) {
+    try {
+      const x = await db
+        .collection("orders")
+        .doc("users")
+        .collection(uid)
+        .doc()
+        .set(bookingDetails);
+      console.log("added order successfully");
+      return { response: "ok" };
+    } catch (err) {
+      console.log("issue catch block");
+      console.log(err);
+
       throw new functions.https.HttpsError(
-        "invalid-argument",
-        "no arguments expected"
+        "internal",
+        "some internal error try back later"
       );
     }
-
-    validateUser(context);
-
-    return admin
-      .firestore()
-      .collection("orders")
-      .get()
-      .then((doc) => {
-        const snap: any = [];
-        doc.forEach((dx) => {
-          // snap.push({ id: dx.id, details: dx.data() });
-        });
-        console.log("delivered a snapshot");
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        return { orders: snap };
-      })
-      .catch((err) => {
-        console.log(err);
-        throw new functions.https.HttpsError(
-          "internal",
-          "some internal error try back later"
-        );
-      });
   });
 
 // #region ## ----------------- utility methods ----------------- ##
-// validate a user if it authenticated && has evrcare email and it is verified
+
 function validateUser(context: functions.https.CallableContext): void {
+  console.log("validating user");
+
   if (!context.auth || !context.auth.uid) {
+    console.log("validation issue!");
+
     throw new functions.https.HttpsError("unauthenticated", "no user found");
   }
-
-  console.log(
-    context.auth.uid,
-    context.auth.token.email,
-    context.auth.token.email_verified
-  );
-
-  // if (!context.auth.token.email) {
-  //   throw new functions.https.HttpsError(
-  //     "failed-precondition",
-  //     "user has no email id please update your profile"
-  //   );
-  // }
-
-  // if(!context.auth.token.email.match(/[a-z0-9._-]+@gmail+\.com/)){
-  //     throw new functions.https.HttpsError("permission-denied","your are trying to access restriced resources!");
-  // }
-
-  // if (!context.auth.token.email_verified) {
-  //   throw new functions.https.HttpsError(
-  //     "permission-denied",
-  //     "email not verified"
-  //   );
-  // }
+  console.log("user validated");
 }
